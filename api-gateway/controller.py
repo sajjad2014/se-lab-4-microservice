@@ -1,6 +1,9 @@
 from flask import Flask, json, Response, request
 from flask_restful import Resource, Api, reqparse, abort, marshal, fields
 import requests
+from api_gateway_logic import APILogic
+
+apiLogic = APILogic()
 
 
 class Signup(Resource):
@@ -45,8 +48,10 @@ class Login(Resource):
 
 class ShowProf(Resource):
     def get(self):
-        resp = requests.get("http://localhost:5002/showprof", headers={'token': request.headers.get('token')})
-        return Response(resp.content, resp.status_code)
+        if apiLogic.is_valid(request.headers.get('token')):
+            resp = requests.get("http://localhost:5002/showprof", headers={'token': request.headers.get('token')})
+            return Response(resp.content, resp.status_code)
+        Response('{"error": "invalid token"}', 401)
 
 
 class UpdateProf(Resource):
@@ -65,8 +70,11 @@ class UpdateProf(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        resp = requests.post("http://localhost:5002/updateprof", json=args, headers={'token': request.headers.get('token')})
-        return Response(resp.content, resp.status_code)
+        if apiLogic.is_valid(request.headers.get('token')):
+            resp = requests.post("http://localhost:5002/updateprof", json=args,
+                                 headers={'token': request.headers.get('token')})
+            return Response(resp.content, resp.status_code)
+        Response('{"error": "invalid token"}', 401)
 
 
 app = Flask(__name__)
