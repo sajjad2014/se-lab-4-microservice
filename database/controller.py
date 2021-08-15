@@ -45,8 +45,7 @@ class UpdateProfile(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        database_logic.update_profile(args["username"], args["password"], args["email"], args["mobile"])
-        return "profile updated"
+        return database_logic.update_profile(args["username"], args["password"], args["email"], args["mobile"])
 
 
 class GetUser(Resource):

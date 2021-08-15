@@ -10,7 +10,7 @@ class DatabaseLogic:
         self.db.insert(username, password, email, mobile, status)
 
     def update_profile(self, username, password, email, mobile):
-        self.db.update(username, password, email, mobile)
+        return self.decode_prof(self.db.update(username, password, email, mobile))
 
     def remove_user(self, username):
         self.db.delete(username)

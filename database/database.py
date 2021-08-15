@@ -23,10 +23,12 @@ class Database:
                        f"SET password=%s, " \
                        f"email=%s, " \
                        f"mobile=%s " \
-                       f"WHERE username = %s; "
+                       f"WHERE username = %s " \
+                       f"RETURNING *; "
         record = (password, email, mobile, username)
         self.cur.execute(update_query, record)
         self.conn.commit()
+        return self.cur.fetchone()
 
     def delete(self, username):
         delete_query = f"DELETE FROM public.{self.table_name} " \
