@@ -9,7 +9,7 @@ Under postgres create a table with name "profile"
 
 Table should have following columns:
 
-username, password, email, mobile
+username, password, email, mobile, status
 
 where all columns are of the type text and username is the primary key.
 

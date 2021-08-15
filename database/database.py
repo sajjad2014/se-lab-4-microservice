@@ -11,10 +11,10 @@ class Database:
         self.cur = self.conn.cursor()
         self.table_name = "profile"
 
-    def insert(self, username, password, email=None, mobile=None):
-        insert_query = f"INSERT INTO public.{self.table_name} (username, password, email, mobile) " \
-                       f"VALUES(%s, %s, %s, %s)"
-        record = (username, password, email, mobile)
+    def insert(self, username, password, email=None, mobile=None, status="user"):
+        insert_query = f"INSERT INTO public.{self.table_name} (username, password, email, mobile, status) " \
+                       f"VALUES(%s, %s, %s, %s, %s)"
+        record = (username, password, email, mobile, status)
         self.cur.execute(insert_query, record)
         self.conn.commit()
 
