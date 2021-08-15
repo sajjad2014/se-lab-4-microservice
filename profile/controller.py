@@ -12,7 +12,9 @@ class ShowProf(Resource):
         token = request.headers.get('token')
         username = jwt.decode(token, self._secret, "HS256")["username"]
         resp = requests.get("http://127.0.0.1:5003/getuser/" + username)
-        return Response(resp.content, resp.status_code)
+        prof = json.loads(resp.content)
+        prof['password'] = len(prof['password']) * '*'
+        return Response(json.dumps(prof), resp.status_code)
 
 
 class UpdateProf(Resource):
