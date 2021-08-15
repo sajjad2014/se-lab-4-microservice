@@ -1,6 +1,8 @@
 from flask import Flask, json, Response, request
 from flask_restful import Resource, Api, reqparse, abort, marshal, fields
 import requests
+import json
+from auth_logic import AuthLogic
 
 app = Flask(__name__)
 api = Api(app)
@@ -21,15 +23,15 @@ class Signup(Resource):
         self.reqparse.add_argument(
             "mobile", type=str, required=True, help="The mobile number must be provided", location="json"
         )
-
+        self.auth = AuthLogic()
 
     def post(self):
         args = self.reqparse.parse_args()
         resp = requests.post("http://localhost:5003/signup", json=args)
         if resp.status_code >= 400:
             return Response(resp.content, resp.status_code)
-        # todo create jwt token in logic and set as header
-        return Response(resp.content, resp.status_code) # todo header
+        token = self.auth.create_token(args["username"])
+        return Response(json.dumps({"token": token}), resp.status_code)
 
 
 class Login(Resource):
@@ -41,7 +43,7 @@ class Login(Resource):
         self.reqparse.add_argument(
             "password", type=str, required=True, help="The password must be provided", location="json"
         )
-
+        self.auth = AuthLogic()
 
     def post(self):
         args = self.reqparse.parse_args()
@@ -50,8 +52,8 @@ class Login(Resource):
             return Response('{"error": "user does not exist"}', 400)
         if json.loads(user_resp.content)["password"] != args["password"]:
             return Response('{"error": "incorrect username or password"}', 400)
-        # todo create jwt token
-        return Response('{"token": }', 200)  #todo
+        token = self.auth.create_token(args["username"])
+        return Response(json.dumps({"token": token}), 200)
 
 
 api.add_resource(Signup, '/signup')
