@@ -28,9 +28,15 @@ class Signup(Response):
         database_logic.add_new_user(args["username"], args["password"], args["email"], args["mobile"])
 
 
+class GetUser(Response):
+    def get(self, username):
+        return database_logic.get_profile(username) # todo should be dictionary
+
+
 app = Flask(__name__)
 api = Api(app)
 api.add_resource(Signup, '/signup')
+api.add_resource(GetUser, '/getuser/<str:username>')
 
 if __name__ == '__main__':
     app.run(port=5003, debug=True)
