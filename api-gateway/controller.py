@@ -37,14 +37,14 @@ def increase_prof_fail():
         prof_start_fail = current_seconds()
 
 def check_auth_valid():
-    if current_seconds() - auth_start_fail > 30:
+    if auth_start_fail is None or current_seconds() - auth_start_fail > 30:
         auth_available = True
         auth_fail_count = 0
         return True
     return False
 
 def check_prof_valid():
-    if current_seconds() - prof_start_fail > 30:
+    if prof_start_fail is None or current_seconds() - prof_start_fail > 30:
         prof_available = True
         prof_fail_count = 0
         return True
