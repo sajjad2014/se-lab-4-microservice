@@ -11,7 +11,7 @@ class ShowProf(Resource):
     def get(self):
         token = request.headers.get('token')
         username = jwt.decode(token, self._secret, "HS256")["username"]
-        resp = requests.get("http://localhost:5003/getuser/" + username)
+        resp = requests.get("http://127.0.0.1:5003/getuser/" + username)
         return Response(resp.content, resp.status_code)
 
 
@@ -34,7 +34,7 @@ class UpdateProf(Resource):
         token = request.headers.get('token')
         username = jwt.decode(token, self._secret, "HS256")["username"]
         args["username"] = username
-        resp = requests.post("http://localhost:5003/updateprof", json=args)
+        resp = requests.post("http://127.0.0.1:5003/updateprof", json=args)
         return Response(resp.content, resp.status_code)
 
 
