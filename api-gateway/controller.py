@@ -18,10 +18,10 @@ auth_start_fail = None
 prof_start_fail = None
 
 def current_seconds():
-    return round(time.time() * 1000 * 1000)
+    return round(time.time())
 
 def increase_auth_fail():
-    global auth_fail_count
+    global auth_fail_count, auth_available, auth_start_fail
     auth_fail_count += 1
     if auth_fail_count == 3:
         auth_available = False
@@ -29,7 +29,7 @@ def increase_auth_fail():
         auth_start_fail = current_seconds()
 
 def increase_prof_fail():
-    global prof_fail_count
+    global prof_fail_count, prof_available, prof_start_fail
     prof_fail_count += 1
     if prof_fail_count == 3:
         prof_available = False
@@ -37,16 +37,16 @@ def increase_prof_fail():
         prof_start_fail = current_seconds()
 
 def check_auth_valid():
+    global auth_available, auth_fail_count
     if auth_start_fail is None or current_seconds() - auth_start_fail > 30:
         auth_available = True
-        auth_fail_count = 0
         return True
     return False
 
 def check_prof_valid():
+    global prof_available, prof_fail_count
     if prof_start_fail is None or current_seconds() - prof_start_fail > 30:
         prof_available = True
-        prof_fail_count = 0
         return True
     return False
 
@@ -71,7 +71,7 @@ class Signup(Resource):
             return Response('{"error": "Authentication service is down"}', 503)
         args = self.reqparse.parse_args()
         try:
-            resp = requests.post("http://127.0.0.1:5001/signup", json=args)
+            resp = requests.post("http://127.0.0.1:5001/signup", json=args, timeout=5)
         except Timeout:
             increase_auth_fail()
             return Response(json.dumps({"error": "Connection Timed Out"}), 408)
