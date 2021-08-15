@@ -48,6 +48,8 @@ class Login(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         user_resp = requests.get("http://127.0.0.1:5003/getuser/" + args["username"])
+        if user_resp.status_code >= 500:
+            return Response('{"error": "server unavailable"}', user_resp.status_code)
         if user_resp.status_code >= 400:
             return Response('{"error": "user does not exist"}', 400)
         if json.loads(user_resp.content)["password"] != args["password"]:
