@@ -53,6 +53,7 @@ app = Flask(__name__)
 api = Api(app)
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
+api.add_resource(ShowProf, '/showprof')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
