@@ -1,4 +1,4 @@
-from flask import Flask, json, Response
+from flask import Flask, json, Response, request
 from flask_restful import Resource, Api, reqparse, abort, marshal, fields
 import requests
 
@@ -40,6 +40,12 @@ class Login(Resource):
     def post(self):
         args = self.reqparse.parse_args()
         resp = requests.post("http://localhost:5001/login", json=args)
+        return Response(resp.content, resp.status_code)
+
+
+class ShowProf(Resource):
+    def get(self):
+        resp = requests.get("http://localhost:5002/showprof", headers={'token': request.headers.get('token')})
         return Response(resp.content, resp.status_code)
 
 
