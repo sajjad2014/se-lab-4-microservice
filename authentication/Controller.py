@@ -32,7 +32,30 @@ class Signup(Resource):
         return Response(resp.content, resp.status_code) # todo header
 
 
+class Login(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            "username", type=str, required=True, help="The username must be provided", location="json"
+        )
+        self.reqparse.add_argument(
+            "password", type=str, required=True, help="The password must be provided", location="json"
+        )
+
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        user_resp = requests.get("http://localhost:5003/getuser/" + args["username"])
+        if user_resp.status_code >= 400:
+            return Response('{"error": "user does not exist"}', 400)
+        if json.loads(user_resp.content)["password"] != args["password"]:
+            return Response('{"error": "incorrect username or password"}', 400)
+        # todo create jwt token
+        return Response('{"token": }', 200)  #todo
+
+
 api.add_resource(Signup, '/signup')
+api.add_resource(Login, '/login')
 
 if __name__ == '__main__':
     app.run(port=5001, debug=True)
