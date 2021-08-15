@@ -30,7 +30,7 @@ class Signup(Resource):
         global auth_fail_count
         args = self.reqparse.parse_args()
         try:
-            resp = requests.post("http://localhost:5001/signup", json=args, timeout=0.5)
+            resp = requests.post("http://127.0.0.1:5001/signup", json=args)
         except Timeout:
             auth_fail_count += 1
             #todo disable if needed
@@ -55,7 +55,7 @@ class Login(Resource):
         global auth_fail_count
         args = self.reqparse.parse_args()
         try:
-            resp = requests.post("http://localhost:5001/login", json=args, timeout=0.5)
+            resp = requests.post("http://127.0.0.1:5001/login", json=args, timeout=5)
         except Timeout:
             auth_fail_count += 1
             #todo disable if needed
@@ -71,7 +71,7 @@ class ShowProf(Resource):
         global prof_fail_count
         if apiLogic.is_valid(request.headers.get('token')):
             try:
-                resp = requests.get("http://localhost:5002/showprof", headers={'token': request.headers.get('token')}, timeout=0.5)
+                resp = requests.get("http://127.0.0.1:5002/showprof", headers={'token': request.headers.get('token')}, timeout=5)
             except Timeout:
                 prof_fail_count += 1
                 # todo disable if needed
@@ -80,7 +80,7 @@ class ShowProf(Resource):
                 prof_fail_count += 1
                 # todo disable if needed
             return Response(resp.content, resp.status_code)
-        Response('{"error": "invalid token"}', 401)
+        return Response('{"error": "invalid token"}', 401)
 
 
 class UpdateProf(Resource):
@@ -101,8 +101,8 @@ class UpdateProf(Resource):
         args = self.reqparse.parse_args()
         if apiLogic.is_valid(request.headers.get('token')):
             try:
-                resp = requests.post("http://localhost:5002/updateprof", json=args,
-                                     headers={'token': request.headers.get('token')}, timeout=0.5)
+                resp = requests.post("http://127.0.0.1:5002/updateprof", json=args,
+                                     headers={'token': request.headers.get('token')}, timeout=5)
             except Timeout:
                 self.fail_count += 1
                 # todo disable if needed
@@ -111,7 +111,7 @@ class UpdateProf(Resource):
                 self.fail_count += 1
                 # todo disable if needed
             return Response(resp.content, resp.status_code)
-        Response('{"error": "invalid token"}', 401)
+        return Response('{"error": "invalid token"}', 401)
 
 
 app = Flask(__name__)
