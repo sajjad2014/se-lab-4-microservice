@@ -7,6 +7,9 @@ from api_gateway_logic import APILogic
 apiLogic = APILogic()
 
 
+auth_fail_count = 0
+prof_fail_count = 0
+
 class Signup(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
@@ -22,18 +25,18 @@ class Signup(Resource):
         self.reqparse.add_argument(
             "mobile", type=str, required=True, help="The mobile number must be provided", location="json"
         )
-        self.fail_count = 0
 
     def post(self):
+        global auth_fail_count
         args = self.reqparse.parse_args()
         try:
             resp = requests.post("http://localhost:5001/signup", json=args, timeout=0.5)
         except Timeout:
-            self.fail_count += 1
+            auth_fail_count += 1
             #todo disable if needed
             return Response(json.dumps({"error": "Connection Timed Out"}), 408)
-        if resp.content >= 500:
-            self.fail_count += 1
+        if resp.status_code >= 500:
+            auth_fail_count += 1
             #todo disable if needed
         return Response(resp.content, resp.status_code)
 
@@ -47,36 +50,34 @@ class Login(Resource):
         self.reqparse.add_argument(
             "password", type=str, required=True, help="The password must be provided", location="json"
         )
-        self.fail_count = 0
 
     def post(self):
+        global auth_fail_count
         args = self.reqparse.parse_args()
         try:
             resp = requests.post("http://localhost:5001/login", json=args, timeout=0.5)
         except Timeout:
-            self.fail_count += 1
+            auth_fail_count += 1
             #todo disable if needed
             return Response(json.dumps({"error": "Connection Timed Out"}), 408)
-        if resp.content >= 500:
-            self.fail_count += 1
+        if resp.status_code >= 500:
+            auth_fail_count += 1
             #todo disable if needed
         return Response(resp.content, resp.status_code)
 
 
 class ShowProf(Resource):
-    def __init__(self):
-        self.fail_count = 0
-
     def get(self):
+        global prof_fail_count
         if apiLogic.is_valid(request.headers.get('token')):
             try:
                 resp = requests.get("http://localhost:5002/showprof", headers={'token': request.headers.get('token')}, timeout=0.5)
             except Timeout:
-                self.fail_count += 1
+                prof_fail_count += 1
                 # todo disable if needed
                 return Response(json.dumps({"error": "Connection Timed Out"}), 408)
-            if resp.content >= 500:
-                self.fail_count += 1
+            if resp.status_code >= 500:
+                prof_fail_count += 1
                 # todo disable if needed
             return Response(resp.content, resp.status_code)
         Response('{"error": "invalid token"}', 401)
@@ -106,7 +107,7 @@ class UpdateProf(Resource):
                 self.fail_count += 1
                 # todo disable if needed
                 return Response(json.dumps({"error": "Connection Timed Out"}), 408)
-            if resp.content >= 500:
+            if resp.status_code >= 500:
                 self.fail_count += 1
                 # todo disable if needed
             return Response(resp.content, resp.status_code)
