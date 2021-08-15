@@ -49,11 +49,32 @@ class ShowProf(Resource):
         return Response(resp.content, resp.status_code)
 
 
+class UpdateProf(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            "password", type=str, required=True, help="The password must be provided", location="json"
+        )
+        self.reqparse.add_argument(
+            "email", type=str, required=True, help="The email must be provided", location="json"
+        )
+        self.reqparse.add_argument(
+            "mobile", type=str, required=True, help="The mobile number must be provided", location="json"
+        )
+
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        resp = requests.post("http://localhost:5002/updateprof", json=args, headers={'token': request.headers.get('token')})
+        return Response(resp.content, resp.status_code)
+
+
 app = Flask(__name__)
 api = Api(app)
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
 api.add_resource(ShowProf, '/showprof')
+api.add_resource(UpdateProf, '/updateprof')
 
 if __name__ == '__main__':
     app.run(port=5000, debug=True)
