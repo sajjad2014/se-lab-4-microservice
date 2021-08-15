@@ -27,7 +27,7 @@ class Signup(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        resp = requests.post("http://localhost:5003/signup", json=args)
+        resp = requests.post("http://127.0.0.1:5003/signup", json=args)
         if resp.status_code >= 400:
             return Response(resp.content, resp.status_code)
         token = self.auth.create_token(args["username"])
@@ -47,7 +47,7 @@ class Login(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        user_resp = requests.get("http://localhost:5003/getuser/" + args["username"])
+        user_resp = requests.get("http://127.0.0.1:5003/getuser/" + args["username"])
         if user_resp.status_code >= 400:
             return Response('{"error": "user does not exist"}', 400)
         if json.loads(user_resp.content)["password"] != args["password"]:
