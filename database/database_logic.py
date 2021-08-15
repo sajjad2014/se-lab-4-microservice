@@ -30,3 +30,6 @@ class DatabaseLogic:
         for column, value in zip(self.columns, prof):
             dic_prof[column] = value
         return dic_prof
+
+    def refresh(self):
+        self.db = Database()

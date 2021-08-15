@@ -23,7 +23,11 @@ class Signup(Resource):
 
     def post(self):
         args = self.reqparse.parse_args()
-        database_logic.add_new_user(args["username"], args["password"], args["email"], args["mobile"])
+        try:
+            database_logic.add_new_user(args["username"], args["password"], args["email"], args["mobile"])
+        except:
+            database_logic.refresh()
+            return Response(json.dumps({"error": "query failed"}), 400)
         return "New user signed up"
 
 
