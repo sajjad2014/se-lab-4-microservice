@@ -16,6 +16,9 @@ class TweetLogic:
     def get_user_tweets(self, user_name):
         return self.db.fetch_user(user_name)
 
+    def get_all_tweets(self):
+        return self.db.fetch_all()
+
     def is_token_valid(self, token):
         try:
             jwt.decode(token, self._secret, "HS256")

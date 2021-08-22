@@ -48,10 +48,19 @@ class GetUserTweets(Resource):
             return user_tweets
 
 
+class GetAllTweets(Resource):
+    def get(self):
+        token = request.headers.get('token')
+        if tweet_logic.is_token_valid(token):
+            user_tweets = tweet_logic.get_all_tweets()
+            return user_tweets
+
+
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(AddTweet, '/addtweet')
+api.add_resource(AddTweet, '/addtweet/')
 api.add_resource(DeleteTweet, '/deletetweet/<int:tweet_id>')
+api.add_resource(GetAllTweets, '/gettweets/')
 api.add_resource(GetUserTweets, '/gettweets/<string:user_name>')
 
 

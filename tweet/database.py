@@ -33,3 +33,10 @@ class TweetDatabase:
         record = [username]
         self.cur.execute(select_query, record)
         return self.cur.fetchall()
+
+    def fetch_all(self):
+        select_query = f"select to_json(d) from (" \
+                       f"SELECT * FROM public.{self.table_name} " \
+                       f"ORDER BY date  DESC) as d"
+        self.cur.execute(select_query)
+        return self.cur.fetchall()
