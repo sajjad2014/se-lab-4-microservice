@@ -249,7 +249,7 @@ class Dashboard(Resource):
         if not apiLogic.is_valid(request.headers.get('token')):
             return Response('{"error": "invalid token"}', 401)
         try:
-            resp = requests.get("http://127.0.0.1:5004/dashboard",
+            resp = requests.get("http://127.0.0.1:5004/gettweets",
                                  headers={'token': request.headers.get('token')}, timeout=5)
         except Timeout:
             increase_tweet_fail()
