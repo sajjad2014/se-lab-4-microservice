@@ -61,7 +61,7 @@ class Login(Resource):
             prof = auth_logic.decode_prof(prof)
         except:
             return Response('{"error": "user does not exist"}', 400)
-        if json.loads(prof)["password"] != args["password"]:
+        if prof["password"] != args["password"]:
             return Response('{"error": "incorrect username or password"}', 400)
         token = self.auth.create_token(args["username"])
         return Response(json.dumps({"token": token}), 200)
