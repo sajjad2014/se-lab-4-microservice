@@ -2,7 +2,9 @@ from flask import Flask, json, Response, request
 from flask_restful import Resource, Api, reqparse, abort, marshal, fields
 import requests
 import jwt
+from profile_logic import ProfileLogic
 
+profile_logic = ProfileLogic()
 
 class ShowProf(Resource):
     def __init__(self):
@@ -11,8 +13,8 @@ class ShowProf(Resource):
     def get(self):
         token = request.headers.get('token')
         username = jwt.decode(token, self._secret, "HS256")["username"]
-        resp = requests.get("http://127.0.0.1:5003/getuser/" + username)
-        prof = json.loads(resp.content)
+        prof = profile_logic.get_profile(username)
+        prof = profile_logic.decode_prof(prof)  # dict
         prof['password'] = len(prof['password']) * '*'
         return Response(json.dumps(prof), resp.status_code)
 
