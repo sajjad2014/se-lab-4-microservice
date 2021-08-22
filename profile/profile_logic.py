@@ -1,3 +1,4 @@
+import jwt
 from database import Database
 
 
@@ -5,6 +6,7 @@ class ProfileLogic:
     def __init__(self):
         self.db = Database()
         self.columns = ["username", "password", "email", "mobile", "status"]
+        self._secret = "sercert_password_asdfhn12234@#"
 
     def add_new_user(self, username, password, email=None, mobile=None, status="user"):
         self.db.insert(username, password, email, mobile, status)
@@ -33,3 +35,14 @@ class ProfileLogic:
 
     def refresh(self):
         self.db = Database()
+
+    def is_token_valid(self, token):
+        try:
+            jwt.decode(token, self._secret, "HS256")
+            return True
+        except:
+            return False
+
+    def decode_token(self, token):
+        return jwt.decode(token, self._secret, "HS256")
+
