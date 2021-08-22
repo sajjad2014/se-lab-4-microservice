@@ -141,19 +141,21 @@ class Login(Resource):
 
 
 class ShowProf(Resource):
-    def get(self):
-        if not check_prof_valid():
-            return Response('{"error": "Profile service is down"}', 503)
-        if apiLogic.is_valid(request.headers.get('token')):
-            try:
-                resp = requests.get("http://127.0.0.1:5002/showprof", headers={'token': request.headers.get('token')}, timeout=5)
-            except Timeout:
-                increase_prof_fail()
-                return Response(json.dumps({"error": "Connection Timed Out"}), 408)
-            if resp.status_code >= 500:
-                increase_prof_fail()
-            return Response(resp.content, resp.status_code)
-        return Response('{"error": "invalid token"}', 401)
+    def get(self, username):
+        if not check_pac_valid():
+            return Response('{"error": "Profile-api-composition service is down"}', 503)
+        if not apiLogic.is_valid(request.headers.get('token')):
+            return Response('{"error": "invalid token"}', 401)
+        try:
+            resp = requests.get("http://127.0.0.1:5005/showprof/" + username,
+                                headers={'token': request.headers.get('token')}, timeout=5)
+        except Timeout:
+            increase_pac_fail()
+            return Response(json.dumps({"error": "Connection Timed Out"}), 408)
+        if resp.status_code >= 500:
+            increase_pac_fail()
+        return Response(resp.content, resp.status_code)
+
 
 
 class UpdateProf(Resource):
@@ -173,17 +175,17 @@ class UpdateProf(Resource):
         if not check_prof_valid():
             return Response('{"error": "Profile service is down"}', 503)
         args = self.reqparse.parse_args()
-        if apiLogic.is_valid(request.headers.get('token')):
-            try:
-                resp = requests.post("http://127.0.0.1:5002/updateprof", json=args,
-                                     headers={'token': request.headers.get('token')}, timeout=5)
-            except Timeout:
-                increase_prof_fail()
-                return Response(json.dumps({"error": "Connection Timed Out"}), 408)
-            if resp.status_code >= 500:
-                increase_prof_fail()
-            return Response(resp.content, resp.status_code)
-        return Response('{"error": "invalid token"}', 401)
+        if not apiLogic.is_valid(request.headers.get('token')):
+            return Response('{"error": "invalid token"}', 401)
+        try:
+            resp = requests.post("http://127.0.0.1:5002/updateprof", json=args,
+                                 headers={'token': request.headers.get('token')}, timeout=5)
+        except Timeout:
+            increase_prof_fail()
+            return Response(json.dumps({"error": "Connection Timed Out"}), 408)
+        if resp.status_code >= 500:
+            increase_prof_fail()
+        return Response(resp.content, resp.status_code)
 
 
 class AddTweet(Resource):
@@ -229,18 +231,18 @@ class DeleteTweet(Resource):
 
 class Dashboard(Resource):
     def get(self):
-        if not check_pac_valid():
-            return Response('{"error": "Profile-api-composition or one of its dependant services is down"}', 503)
+        if not check_tweet_valid():
+            return Response('{"error": "Tweet service is down"}', 503)
         if not apiLogic.is_valid(request.headers.get('token')):
             return Response('{"error": "invalid token"}', 401)
         try:
-            resp = requests.get("http://127.0.0.1:5005/dashboard",
+            resp = requests.get("http://127.0.0.1:5004/dashboard",
                                  headers={'token': request.headers.get('token')}, timeout=5)
         except Timeout:
-            increase_pac_fail()
+            increase_tweet_fail()
             return Response(json.dumps({"error": "Connection Timed Out"}), 408)
         if resp.status_code >= 500:
-            increase_pac_fail()
+            increase_tweet_fail()
         return Response(resp.content, resp.status_code)
 
 
@@ -248,7 +250,7 @@ app = Flask(__name__)
 api = Api(app)
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
-api.add_resource(ShowProf, '/showprof') # todo
+api.add_resource(ShowProf, '/showprof/<string:username>')
 api.add_resource(UpdateProf, '/updateprof')
 api.add_resource(AddTweet, '/addtweet')
 api.add_resource(DeleteTweet, '/deletetweet/<int:id>')
