@@ -35,6 +35,10 @@ class Signup(Resource):
             auth_logic.refresh()
             return Response(json.dumps({"error": "query failed"}), 400)
         token = self.auth.create_token(args["username"])
+        # send event
+        decode_token = auth_logic.get_token(token)
+        requests.post("http://127.0.0.1:5006/submitevent",
+                      json={"type": "signup", "data": json.dumps({"header": decode_token, "payload": args})})
         return Response(json.dumps({"token": token}), 200)
 
 
@@ -61,6 +65,27 @@ class Login(Resource):
             return Response('{"error": "incorrect username or password"}', 400)
         token = self.auth.create_token(args["username"])
         return Response(json.dumps({"token": token}), 200)
+
+
+class EventHandler(Resource):
+    def __init__(self):
+        self.reqparse = reqparse.RequestParser()
+        self.reqparse.add_argument(
+            "type", type=str, required=True, help="The type must be provided", location="json"
+        )
+        self.reqparse.add_argument(
+            "data", type=str, required=True, help="The data must be provided", location="json"
+        )
+
+    def post(self):
+        args = self.reqparse.parse_args()
+        type = args["type"]
+        if type != "updateprof":
+            return
+        data = json.loads(args["data"])
+        payload = data["payload"]
+        new_prof = auth_logic.update_profile(payload["username"], payload["password"])
+        return Response(json.dumps(new_prof), 200)
 
 
 api.add_resource(Signup, '/signup')

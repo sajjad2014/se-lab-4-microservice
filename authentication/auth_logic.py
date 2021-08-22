@@ -16,6 +16,9 @@ class AuthLogic:
     def add_new_user(self, username, password, status="user"):
         self.db.insert(username, password, status)
 
+    def update_profile(self, username, password):
+        return self.decode_prof(self.db.update(username, password))
+
     def remove_user(self, username):
         self.db.delete(username)
 
@@ -30,3 +33,6 @@ class AuthLogic:
 
     def refresh(self):
         self.db = Database()
+
+    def get_token(self, token):
+        return jwt.decode(token, self._secret, "HS256")
