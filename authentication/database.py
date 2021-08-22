@@ -13,14 +13,14 @@ class Database:
 
     def insert(self, username, password, status="user"):
         insert_query = f"INSERT INTO public.{self.table_name} (username, password, status) " \
-                       f"VALUES(%s, %s, %s, %s, %s)"
+                       f"VALUES(%s, %s, %s)"
         record = (username, password, status)
         self.cur.execute(insert_query, record)
         self.conn.commit()
 
     def update(self, username, password):
         update_query = f"UPDATE public.{self.table_name} " \
-                       f"SET password=%s, " \
+                       f"SET password=%s " \
                        f"WHERE username = %s " \
                        f"RETURNING *; "
         record = (password, username)

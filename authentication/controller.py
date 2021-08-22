@@ -90,6 +90,7 @@ class EventHandler(Resource):
 
 api.add_resource(Signup, '/signup')
 api.add_resource(Login, '/login')
+api.add_resource(EventHandler, '/eventhandler')
 
 if __name__ == '__main__':
     app.run(port=5001, debug=True)
