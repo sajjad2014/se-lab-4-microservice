@@ -14,7 +14,7 @@ class ShowProf(Resource):
         # user tweets
         tweets_req = requests.get("http://127.0.0.1:5004/gettweets/" + username,
                               headers={'token': request.headers.get('token')})
-        return Response('{"body": ' + profile_req.content + ', "tweets": ' + tweets_req.content + '}', 200)
+        return Response('{"body": ' + profile_req.content.decode("utf-8") + ', "tweets": ' + tweets_req.content.decode("utf-8") + '}', 200)
 
 app = Flask(__name__)
 api = Api(app)
