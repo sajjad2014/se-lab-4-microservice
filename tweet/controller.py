@@ -25,6 +25,9 @@ class AddTweet(Resource):
                 return Response(json.dumps({"error": "Admins can not tweet"}), 403)
             tweet = args["tweet"]
             tweet_logic.add_tweet(user_name, tweet)
+            # sending event
+            requests.post("http://127.0.0.1:5006/submitevent",
+                          json={"type": "addtweet", "data": {"header": decode_token, "payload": args}})
             return Response(json.dumps({"msg": "Tweet was saved"}), 200)
 
 
@@ -37,6 +40,9 @@ class DeleteTweet(Resource):
             if status == "user":
                 return Response(json.dumps({"error": "Users can not remove tweets"}), 403)
             tweet_logic.delete_tweet(tweet_id)
+            # sending event
+            requests.post("http://127.0.0.1:5006/submitevent",
+                          json={"type": "deletetweet", "data": {"header": decode_token, "payload": {"tweet_id": tweet_id}}})
             return Response(json.dumps({"msg": "Tweet was deleted"}), 200)
 
 
