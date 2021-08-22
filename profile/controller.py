@@ -16,7 +16,7 @@ class ShowProf(Resource):
         prof = profile_logic.get_profile(username)
         prof = profile_logic.decode_prof(prof)  # dict
         prof['password'] = len(prof['password']) * '*'
-        return Response(json.dumps(prof), resp.status_code)
+        return Response(json.dumps(prof), 200)
 
 
 class UpdateProf(Resource):
@@ -38,10 +38,9 @@ class UpdateProf(Resource):
         token = request.headers.get('token')
         username = jwt.decode(token, self._secret, "HS256")["username"]
         args["username"] = username
-        resp = requests.post("http://127.0.0.1:5003/updateprof", json=args)
-        prof = json.loads(resp.content)
+        prof = profile_logic.update_profile(args["username"], args["password"], args["email"], args["mobile"])
         prof['password'] = len(prof['password']) * '*'
-        return Response(json.dumps(prof), resp.status_code)
+        return Response(json.dumps(prof), 200)
 
 
 app = Flask(__name__)
