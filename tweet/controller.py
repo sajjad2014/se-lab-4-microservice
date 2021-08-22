@@ -28,9 +28,23 @@ class AddTweet(Resource):
             return Response(json.dumps({"msg": "Tweet was saved"}), 200)
 
 
+class DeleteTweet(Resource):
+    def delete(self, tweet_id):
+        token = request.headers.get('token')
+        if tweet_logic.is_token_valid(token):
+            decode_token = tweet_logic.get_token(token)
+            status = decode_token["status"]
+            if status == "user":
+                return Response(json.dumps({"error": "Users can not remove tweets"}), 403)
+            tweet_logic.delete_tweet(tweet_id)
+            return Response(json.dumps({"msg": "Tweet was deleted"}), 200)
+
+
 app = Flask(__name__)
 api = Api(app)
 api.add_resource(AddTweet, '/addtweet')
+api.add_resource(DeleteTweet, '/deletetweet/<int:tweet_id>')
+
 
 if __name__ == '__main__':
     app.run(port=5004, debug=True)

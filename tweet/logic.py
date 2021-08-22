@@ -10,6 +10,9 @@ class TweetLogic:
     def add_tweet(self, username, tweet):
         self.db.insert(username, tweet)
 
+    def delete_tweet(self, tweet_id):
+        self.db.delete(tweet_id)
+
     def is_token_valid(self, token):
         try:
             jwt.decode(token, self._secret, "HS256")

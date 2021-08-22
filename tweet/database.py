@@ -18,3 +18,9 @@ class TweetDatabase:
         self.cur.execute(insert_query, record)
         self.conn.commit()
 
+    def delete(self, tweet_id):
+        delete_query = f"DELETE FROM public.{self.table_name} " \
+                       f"WHERE id = %s; "
+        record = [tweet_id]
+        self.cur.execute(delete_query, record)
+        self.conn.commit()
