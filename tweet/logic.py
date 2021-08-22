@@ -13,6 +13,9 @@ class TweetLogic:
     def delete_tweet(self, tweet_id):
         self.db.delete(tweet_id)
 
+    def get_user_tweets(self, user_name):
+        return self.db.fetch_user(user_name)
+
     def is_token_valid(self, token):
         try:
             jwt.decode(token, self._secret, "HS256")

@@ -24,3 +24,12 @@ class TweetDatabase:
         record = [tweet_id]
         self.cur.execute(delete_query, record)
         self.conn.commit()
+
+    def fetch_user(self, username):
+        select_query = f"select to_json(d) from (" \
+                       f"SELECT * FROM public.{self.table_name} " \
+                       f"WHERE username = %s " \
+                       f"ORDER BY date  DESC) as d"
+        record = [username]
+        self.cur.execute(select_query, record)
+        return self.cur.fetchall()

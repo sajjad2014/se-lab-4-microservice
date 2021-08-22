@@ -40,10 +40,19 @@ class DeleteTweet(Resource):
             return Response(json.dumps({"msg": "Tweet was deleted"}), 200)
 
 
+class GetUserTweets(Resource):
+    def get(self, user_name):
+        token = request.headers.get('token')
+        if tweet_logic.is_token_valid(token):
+            user_tweets = tweet_logic.get_user_tweets(user_name)
+            return user_tweets
+
+
 app = Flask(__name__)
 api = Api(app)
 api.add_resource(AddTweet, '/addtweet')
 api.add_resource(DeleteTweet, '/deletetweet/<int:tweet_id>')
+api.add_resource(GetUserTweets, '/gettweets/<string:user_name>')
 
 
 if __name__ == '__main__':
