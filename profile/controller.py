@@ -10,9 +10,7 @@ profile_logic = ProfileLogic()
 
 class ShowProf(Resource):
 
-    def get(self):
-        token = request.headers.get('token')
-        username = profile_logic.decode_token(token)["username"]
+    def get(self, username):
         prof = profile_logic.get_profile(username)
         prof = profile_logic.decode_prof(prof)  # dict
         prof['password'] = len(prof['password']) * '*'
@@ -71,7 +69,7 @@ class EventHandler(Resource):
 
 app = Flask(__name__)
 api = Api(app)
-api.add_resource(ShowProf, '/showprof')
+api.add_resource(ShowProf, '/showprof/<string:username>')
 api.add_resource(UpdateProf, '/updateprof')
 api.add_resource(EventHandler, '/eventhandler')
 
