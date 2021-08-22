@@ -36,7 +36,7 @@ def send_events():
         if event_type == 'signup':
             requests.post("http://127.0.0.1:5002/eventhandler", json=top)
         elif event_type == 'updateprof':
-            requests.post("http://127.0.0.1:5003/eventhandler", json=top)
+            requests.post("http://127.0.0.1:5001/eventhandler", json=top)
 
 
 app = Flask(__name__)
