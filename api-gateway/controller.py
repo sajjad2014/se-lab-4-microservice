@@ -4,6 +4,7 @@ import requests
 from requests.exceptions import Timeout
 from api_gateway_logic import APILogic
 import time
+import jwt
 
 apiLogic = APILogic()
 
@@ -194,13 +195,18 @@ class AddTweet(Resource):
         self.reqparse.add_argument(
             "tweet", type=str, required=True, help="The tweet must be provided", location="json"
         )
+        self._secret = "sercert_password_asdfhn12234@#"
 
     def post(self):
         if not check_tweet_valid():
             return Response('{"error": "Tweet service is down"}', 503)
         args = self.reqparse.parse_args()
-        if not apiLogic.is_valid(request.headers.get('token')):
+        token = request.headers.get('token')
+        if not apiLogic.is_valid(token):
             return Response('{"error": "invalid token"}', 401)
+        status = jwt.decode(token, self._secret, "HS256")["status"]
+        if status == "admin":
+            return Response('{"error": "Admins can not add a tweet."}', 401)
         try:
             resp = requests.post("http://127.0.0.1:5004/addtweet", json=args,
                                  headers={'token': request.headers.get('token')}, timeout=5)
@@ -213,11 +219,18 @@ class AddTweet(Resource):
 
 
 class DeleteTweet(Resource):
+    def __init__(self):
+        self._secret = "sercert_password_asdfhn12234@#"
+
     def delete(self, id):
         if not check_tweet_valid():
             return Response('{"error": "Tweet service is down"}', 503)
-        if not apiLogic.is_valid(request.headers.get('token')):
+        token = request.headers.get('token')
+        if not apiLogic.is_valid(token):
             return Response('{"error": "invalid token"}', 401)
+        status = jwt.decode(token, self._secret, "HS256")["status"]
+        if status != "admin":
+            return Response('{"error": "Only admins can delete a tweet."}', 401)
         try:
             resp = requests.delete("http://127.0.0.1:5004/deletetweet/" + str(id),
                                  headers={'token': request.headers.get('token')}, timeout=5)
