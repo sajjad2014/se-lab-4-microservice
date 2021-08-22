@@ -15,14 +15,15 @@ class SubmitEvent(Resource):
     def __init__(self):
         self.reqparse = reqparse.RequestParser()
         self.reqparse.add_argument(
-            "type", type=int, required=True, help="The event type must be provided", location="json"
+            "type", type=str, required=True, help="The event type must be provided", location="json"
         )
         self.reqparse.add_argument(
-            "payload", type=str, required=True, help="The event payload must be provided", location="json"
+            "data", type=str, required=True, help="The event data must be provided", location="json"
         )
 
     def post(self):
         args = self.reqparse.parse_args()
+        print(args)
         msg_logic.add_new_event(json.dumps(args))
         queue.put(args)
         return Response(json.dumps({"msg": "event saved"}), 200)
@@ -33,9 +34,9 @@ def send_events():
         top = queue.get(block=True)
         event_type = top['type']
         if event_type == 'signup':
-            requests.post("http://127.0.0.1:5003/eventhandler", json=top)
-        elif event_type == 'updateprof':
             requests.post("http://127.0.0.1:5002/eventhandler", json=top)
+        elif event_type == 'updateprof':
+            requests.post("http://127.0.0.1:5003/eventhandler", json=top)
 
 
 app = Flask(__name__)
